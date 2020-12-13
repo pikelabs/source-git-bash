@@ -1,0 +1,24 @@
+{
+"specfile": "bash.spec",
+"prebuild": [
+	{
+		"type": "shell",
+		"options": {
+    			"cmd": "echo \"hello\""
+		}
+	},
+	{
+		"type": "shell",
+		"options": {
+			"cmd":  "echo \"world\""
+		}
+	},
+	{
+		"type": "shell",
+		"options": {
+    			"cmd": "tar -czvf bash-4.4.tar.gz --exclude=\"rocky\" -C ../ ."
+		}
+	}
+],
+"sources": ["./"]
+}

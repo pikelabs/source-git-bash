@@ -1,0 +1,12 @@
+diff --git a/parse.y b/parse.y
+--- a/parse.y
++++ b/parse.y
+@@ -4193,7 +4193,7 @@ eof_error:
+ 
+ 	  FREE (nestret);
+ 	}
+-      if MBTEST(ch == '$')
++      if MBTEST(ch == '$' && (tflags & LEX_WASDOL) == 0)
+ 	tflags |= LEX_WASDOL;
+       else
+ 	tflags &= ~LEX_WASDOL;

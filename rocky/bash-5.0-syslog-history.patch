@@ -1,0 +1,84 @@
+diff --git a/bashhist.c b/bashhist.c
+index 9979f99..793c81f 100644
+--- a/bashhist.c
++++ b/bashhist.c
+@@ -754,6 +754,12 @@ extern char *shell_name;
+ #define OPENLOG_OPTS 0
+ #endif
+ 
++#if defined (SYSLOG_SHOPT)
++int syslog_history = SYSLOG_SHOPT;
++#else
++int syslog_history = 1;
++#endif
++
+ void
+ bash_syslog_history (line)
+      const char *line;
+@@ -851,7 +857,8 @@ bash_add_history (line)
+     really_add_history (line);
+ 
+ #if defined (SYSLOG_HISTORY)
+-  bash_syslog_history (line);
++  if (syslog_history)
++    bash_syslog_history (line);
+ #endif
+ 
+   using_history ();
+diff --git a/builtins/shopt.def b/builtins/shopt.def
+index 2febb7e..38c398e 100644
+--- a/builtins/shopt.def
++++ b/builtins/shopt.def
+@@ -118,6 +118,10 @@ extern char *shell_name;
+ extern int debugging_mode;
+ #endif
+ 
++#if defined (SYSLOG_HISTORY) && defined (SYSLOG_SHOPT)
++extern int syslog_history;
++#endif
++
+ static void shopt_error __P((char *));
+ 
+ static int set_shellopts_after_change __P((char *, int));
+@@ -223,6 +227,9 @@ static struct {
+ #endif
+   { "shift_verbose", &print_shift_error, (shopt_set_func_t *)NULL },
+   { "sourcepath", &source_uses_path, (shopt_set_func_t *)NULL },
++#if defined (SYSLOG_HISTORY) && defined (SYSLOG_SHOPT)
++  { "syslog_history", &syslog_history, (shopt_set_func_t *)NULL },
++#endif
+   { "xpg_echo", &xpg_echo, (shopt_set_func_t *)NULL },
+   { (char *)0, (int *)0, (shopt_set_func_t *)NULL }
+ };
+diff --git a/config-top.h b/config-top.h
+index cb0e002..39cf6b5 100644
+--- a/config-top.h
++++ b/config-top.h
+@@ -122,6 +122,13 @@
+ #  define OPENLOG_OPTS LOG_PID
+ #endif
+ 
++/* Define if you want syslogging history to be controllable at runtime via a
++   shell option; if defined, the value is the default for the syslog_history
++   shopt option */
++#if defined (SYSLOG_HISTORY)
++#define SYSLOG_SHOPT 0
++#endif
++
+ /* Define if you want to include code in shell.c to support wordexp(3) */
+ /* #define WORDEXP_OPTION */
+ 
+diff --git a/doc/bash.1 b/doc/bash.1
+index d6cee1d..9dfa0b3 100644
+--- a/doc/bash.1
++++ b/doc/bash.1
+@@ -9889,6 +9889,9 @@ If set, the
+ to find the directory containing the file supplied as an argument.
+ This option is enabled by default.
+ .TP 8
++.B syslog_history
++If set, command history is logged to syslog.
++.TP 8
+ .B xpg_echo
+ If set, the \fBecho\fP builtin expands backslash-escape sequences
+ by default.
