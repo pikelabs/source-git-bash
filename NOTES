@@ -1,5 +1,7 @@
 Platform-Specific Configuration and Operation Notes [somewhat dated]
 ====================================================================
+0. This is example how modifying file from upstream, could be rebraning could be something else just wanna show how it can be done
+
 
 1.  configure --without-gnu-malloc on:
 
